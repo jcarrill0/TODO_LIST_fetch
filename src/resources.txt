@@ -1,0 +1,47 @@
+// import React, {useState,useEffect} from 'react'
+
+// const initialList = [
+//     {
+//       id: "a",
+//       name: "wash the dishes",
+//     }
+//   ];
+
+
+// function App() {
+
+// useEffect (()=>{
+//     //Get request to verify values
+//     const [json_list, setjson_List] = useState(initialList);
+//     //Put request when List changes
+//     function postRequest(url, data) {//data would be newlist
+//         //aqui va la transformacion de list y se hace el setjson_list
+//         return fetch(url, {
+//             //credentials: 'same-origin', // 'include', default: 'omit'
+//             method: 'PUT', // 'GET', 'PUT', 'DELETE', etc.
+//             body: JSON.stringify(data), // Coordinate the body type with 'Content-Type'
+//             headers: {
+//             'Content-Type': 'application/json'
+//             }
+//         })
+//         .then(response => response.json())
+//         .then (data=>{
+//             console.log (data);
+//         })
+//     }
+    
+    
+//     postRequest('https://assets.breatheco.de/apis/fake/todos/user/fpineda1410', newlist)
+//     .then(data => console.log(data)) // Result from the `response.json()` call
+//     .catch(error => console.error(error))
+    
+
+// },[newlist])
+
+// }
+
+
+
+
+// export default App;
+    
