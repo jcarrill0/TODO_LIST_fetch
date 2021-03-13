@@ -30,30 +30,32 @@ const content = {
 }
 
 //Initial list of activities in order to useState
-const initialList = [
-  {
-    id: "a",
-    name: "wash the dishes",
-  }
+let initialList = [
+  // {
+  //   id: "a",
+  //   name: "wash the dishes",
+  // }
 
 ];
 
 
  function ImgMediaCard() {
+   
   const classes = useStyles();
-  const [list, setList] = useState(initialList);
-  const [name, setName] = useState('');
- 
-        function handleChange(event) {
-          setName(event.target.value);
+  const [list, setList] = useState([]);
+  const [nameTask, setNameTask] = useState('');
 
-        }
+        /* La funcion no es necesaria hice uso de esta en el onchange */
+
+        // function handleChange(event) {
+        //   setName(event.target.value);
+
+        // }
       
         function handleAdd() {
-          const newList = list.concat({name, id: uuidv4()});
-          setList(newList);
+          setList([...list, {name: nameTask, id: uuidv4()}]);
 
-          setName('');
+          setNameTask('');
         }
 
         function handleRemove(id) {
@@ -70,47 +72,41 @@ const initialList = [
 
         }
 
-              useEffect (()=>{
+        
+        // Este use effect es para cargar las lista solo una vez
+        useEffect(() => {
+          async function getRequest() {
+            const urlAPI = 'https://assets.breatheco.de/apis/fake/todos/user/fpineda1410'
+            const resultado = await fetch(urlAPI)
+                  .then(res => res.json())
+                  .then(data => data)
+                  resultado.forEach(item => initialList.push({ id: uuidv4(), name: item.label }));
+                  setList(initialList);
+                  // initialList = [];
+          }
+          getRequest();
+        }, [])
 
-                //Put request when List changes
-                function postRequest(url, list) {//data would be newlist
-                    const json_list = [];
-                    if (list.length > 0){
-                      list.forEach((item)=>{ //translates the local List to the requirements of the API
-                        json_list.push({"label": item.name, "done":false});
-                      });
-                    }else {
-                      json_list.push({"label": 'empty', "done":false}); //Generic Value!
-                    }
-                    return fetch(url, {
-                        
-                        method: 'PUT', // 'GET', 'PUT', 'DELETE', etc.
-                        body: JSON.stringify(json_list), // Coordinate the body type with 'Content-Type'
-                        headers: {
-                        'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then (data=>{
-                        console.log(data);
-                    })
-                }
-            //-------------------------------Synchronization with the API 
-                async function Put_Get () {
-                  await postRequest('https://assets.breatheco.de/apis/fake/todos/user/fpineda1410', list)
-                  .then(data => console.log(data)) // Result from the `response.json()` call
-                  .catch(error => console.error(error))
-
-                  fetch('https://assets.breatheco.de/apis/fake/todos/user/fpineda1410') //Generic GET Method to the 4Geeks API
-                  .then(response => response.json())
-                  .then(data => console.log(data))
-                }
-            //-------------------------------END OF Synchronization with the API 
-
-                Put_Get()
-
-                
-            },[list])
+        // Este useeffect detecta cuando hubo un cambio en el array global (eliminar o añadir) y lo añade a la api
+        useEffect (()=> { 
+          async function putRequest() {
+            const urlAPI = 'https://assets.breatheco.de/apis/fake/todos/user/fpineda1410'
+            const json_list = [];
+            
+            if (list.length > 0) { 
+              list.forEach((item) => { //translates the local List to the requirements of the API
+                json_list.push({"label": item.name, "done":false});
+              });
+                await fetch(urlAPI, {
+                  method: "PUT",
+                  body: JSON.stringify(json_list),
+                  headers: {
+                    "Content-Type": "application/json"
+                }})
+            }
+          }
+          putRequest()
+        },[list]);
   
   return (
 
@@ -128,8 +124,8 @@ const initialList = [
           <Card mx="auto" className={classes.root}  >
               <CardContent>
               <AddItem
-                name={name}
-                onChange={handleChange}
+                name={nameTask}
+                onChange={e => setNameTask(e.target.value)}
                 onAdd={handleAdd}
                 onRefresh={refresh}
                 />
@@ -165,7 +161,7 @@ const ListGenerator = ({ list,onRemove }) => {
   const AddItem = ({ name, onChange, onAdd,onRefresh }) => (
     
       <div>
-        <TextField id="standard-basic" value={name} label={content.inputLabel} onChange={onChange}/>
+        <TextField id="standard-basic" value={name} label={content.inputLabel} onChange={onChange} />
         <Button type="button" size="small" color="primary" onClick={onAdd}>
           {content.buttonLabel}
         </Button>
